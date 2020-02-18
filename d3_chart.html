@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Global Dashboard
+	</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/style.css">
+	<meta name="descrption" content="Dingus and Widget info">
+	<meta charset="UTF-8">
+
+	<link href="https://fonts.googleapis.com/css?family=Montserrat%7CPaytone+One&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>stacked bar chart</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <style type="text/css">
+            text { font-family:monospace; font-size:12px; }
+        </style>
+
+</head>
+<body>
+	<img id="head_image" src="./resources/images/dw-logo.png" alt="logo">
+	<h1>Global DashBoard</h1>
+	<table id="t1">
+        <tr>
+            <th>Dingus</th>
+            <th>Widget</th> 
+            <th>Sales</th>
+        </tr>
+        <tr class="grid-container2">
+            <th id = "globalDingus">3</th>
+            <th id = "globalWidget">3</th>
+            <th id = "globalTotal">72.72</th>  
+        </tr>
+    </table>
+    <hr>
+
+<svg id="barCht"></svg>
+<script type="text/javascript">
+    var w = 500,
+        h = 500,
+        padding = 40;
+
+        var dataset = [
+            { dingus: 1,  widget: 1 },
+            { dingus: 2,  widget: 2 },
+        ];
+
+        var fruits = Object.keys(dataset[0]);
+
+        var colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+        var xScale = d3.scaleBand()
+            .domain(d3.range(dataset.length))
+            .range([padding, w - padding])
+            .paddingInner(0.05);
+
+        var yScale = d3.scaleLinear()
+            .domain([0, d3.max(dataset, function(d) {
+                var total = 0;
+                for (var i = 0; i < fruits.length; i++) {
+                    total += d[fruits[i]];
+                }
+                return total;
+            })])
+            .range([h - padding, 0]);
+            
+        var yAxis = d3.axisLeft()
+            .scale(yScale)
+            .ticks(6);
+
+        var stack = d3.stack()
+            .keys(fruits)
+            .order(d3.stackOrderDescending);
+            
+        var series = stack(dataset);
+            
+        var svg = d3.select('svg')
+            .attr('width', w)
+            .attr('height', h)
+
+        var groups = svg.selectAll('g')
+            .data(series)
+            .enter()
+            .append('g')
+            .style('fill', function(d, i){
+                return colors(i);
+            });
+
+        var rects = groups.selectAll('rect')
+            .data(function(d){return d;})
+            .enter()
+            .append('rect')
+            .attr('x', function(d, i){
+                return xScale(i);
+            })
+            .attr('y', function(d){
+                return yScale(d[1]);
+            })
+            .attr('height', function(d) {
+                return yScale(d[0]) - yScale(d[1]);
+            })
+            .attr('width', xScale.bandwidth());
+            
+        svg.append('g')
+            .attr('class', 'y axis')
+            .attr('transform', 'translate(' + padding + ', 0)')
+            .call(yAxis);
+
+        var legend = svg.append('g')
+            .attr('class', 'legend')
+            .attr('transform', 'translate(' + (padding + 12) + ', 0)');
+
+        legend.selectAll('rect')
+            .data(fruits)
+            .enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', function(d, i){
+                return i * 18;
+            })
+            .attr('width', 12)
+            .attr('height', 12)
+            .attr('fill', function(d, i){
+                return colors(i);
+            });
+            
+        legend.selectAll('text')
+            .data(fruits)
+            .enter()
+            .append('text')
+            .text(function(d){
+                return d;
+            })
+            .attr('x', 18)
+            .attr('y', function(d, i){
+                return i * 18;
+            })
+            .attr('text-anchor', 'start')
+            .attr('alignment-baseline', 'hanging');
+
+
+</script>
+
+
+<script src='makevis.js'></script>
+ <div id="my_dataviz"></div>
+ <script>
+
+// set the dimensions and margins of the graph
+var width = 400
+    height = 400
+    margin = 40
+
+// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+var radius = Math.min(width, height) / 2 - margin
+
+var data = {a: 3, b: 4}
+// append the svg object to the div called 'my_dataviz'
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .classed("svg-responsive", true)
+  .classed("svg-container", true) 
+   .attr("preserveAspectRatio", "xMinYMin meet")
+   .attr("viewBox", "0 0 600 400")
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  
+
+// Create dummy data
+
+
+// set the color scale
+var color = d3.scaleOrdinal()
+  .domain(data)
+  .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"])
+
+// Compute the position of each group on the pie:
+var pie = d3.pie()
+  .value(function(d) {return d.value; })
+var data_ready = pie(d3.entries(data))
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+svg
+  .selectAll('whatever')
+  .data(data_ready)
+  .enter()
+  .append('path')
+  .attr('d', d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius)
+  )
+  .attr('fill', function(d){ return(color(d.data.key)) })
+  .attr("stroke", "black")
+  .style("stroke-width", "2px")
+  .style("opacity", 0.7)
+
+</script>
+
+
+
+    <table id="t3">
+    	<caption>Order History</caption>
+        <script 
+            src="hw2.js">
+        </script>
+    	<tr>
+    		<th rowspan="2">ID#</th>
+    		<th rowspan="2">Date</th>
+    		<th colspan="2">Quantity</th>
+    		<th rowspan="2">Total</th>
+    	</tr>
+    	<tr>
+    		<td >Dingus</td>
+    		<td >Widget</td>
+    	</tr>
+        <tbody id="initial">
+            <script type="text/javascript">
+                localStorage.setItem("orders", JSON.stringify(store.orderHistory))
+                if ((localStorage.getItem("orders").length == 0)) {
+                    store.orderHistory = localStorage.getItem("orders");
+                }
+                else {
+                    var table = document.getElementById("initial");
+                    for (var index = 0; index < generateEntries().length; index++) {
+                        order = generateEntries()[index];
+                        var row = table.insertRow(-1);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        var cell4 = row.insertCell(3);
+                        var cell5 = row.insertCell(4);
+                        cell1.innerHTML = order[0];
+                        cell2.innerHTML = order[1];
+                        cell3.innerHTML = order[2];
+                        cell4.innerHTML = order[3];
+                        cell5.innerHTML = ((order[2] * DINGUS_PRICE) + (order[3] * WIDGET_PRICE)).toFixed(2);
+                        var old = localStorage.getItem("orders")
+                        localStorage.setItem("orders", old + order)
+                    }
+                }
+            </script>
+        </tbody>
+        <tfoot>
+    	   <tr>
+    	       <td id="tblFoot" colspan="5"> &copy; 2020 D&W Worldwide. </td>
+            </tr>
+        </tfoot>
+    </table>
+    <form>
+    	<details>
+    		<summary> Order Form </summary>
+            <script src="hw1.js"></script>
+    		<p> Dingus<input id="dingus" placeholder="0" type="text" onkeyup="manage(this);total();"> @ <input type="text" name="cost" value=14.25 id="dingusCost" disabled> =$ <input type="text" placeholder="0.00" id="dingustote" disabled>
+            </p>
+    		<p> Widget<input id="widget" placeholder="0" type="text" onkeyup="manage(this);total2();"> @ <input type="text" name="cost" value=9.99 id="widgetCost" disabled> =$ <input type="text" placeholder="0.00" id="widgettote" disabled>
+            </p>
+    		<p> Total $<input type="text" id="tote" value="0.00" disabled>
+            </p>
+            <button id="btnCancel" class="button-error pure-button" onclick=enableBtn()>Cancel</button>
+            <button type="button" id="btnOrder" class="button-success pure-button" onclick="addRow()" disabled>Order</button>
+            <script>
+                function manage(input) {
+                    var btn = document.getElementById('btnOrder');
+                    if (document.getElementById("dingus").value != '' || document.getElementById("widget").value != '') {
+                        btn.disabled = false;
+                    }
+                    else {
+                        btn.disabled = true;
+                    }
+                }
+                function total() {
+                    var quant = parseFloat(document.getElementById("dingus").value, 10.00);
+                    var cost = parseFloat(document.getElementById("dingusCost").value, 10.00);
+                    var subtote = quant * cost.toFixed(2);
+                    if (document.getElementById("dingus") === NaN) {
+                        subtote = 0.00;
+                    }
+                    document.getElementById("dingustote").value = subtote.toFixed(2);
+                    var total = parseFloat(document.getElementById("tote").value, 10.00);
+                    document.getElementById("tote").value = (total + subtote).toFixed(2)
+                    if (document.getElementById("dingus").value.length == 0) {
+                        document.getElementById("dingustote").value = (0.00).toFixed(2);
+                        document.getElementById("tote").value = (0.00).toFixed(2);
+                    }
+                }
+                function total2() {
+                    var quant = parseFloat(document.getElementById("widget").value, 10);
+                    var cost = parseFloat(document.getElementById("widgetCost").value, 10);                 
+                    var subtote = quant * cost;
+                    document.getElementById("widgettote").value = subtote.toFixed(2);
+                    var total = parseFloat(document.getElementById("tote").value, 10.00);
+                    document.getElementById("tote").value = (total + subtote).toFixed(2)
+                    if (document.getElementById("widget").value.length == 0) {
+                        document.getElementById("widgettote").value = (0.00).toFixed(2);
+                        document.getElementById("tote").value = (0.00).toFixed(2);
+                    }
+                }
+            </script>
+            <script>
+                function enableBtn() {
+                    document.getElementById("btnOrder").disabled = true;
+                }
+            </script>
+            <script>
+                function change() {
+                    var pie = d3.pie()
+                        .value(function(d) { return d.presses; })(data);
+                    path = d3.select("#my_dataviz").selectAll("whatever").data(pie); // Compute the new angles
+                    path.attr("d", arc); // redrawing the path
+                    d3.selectAll("text").data(pie).attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; }); // recomputing the centroid and translating the text accordingly.
+}
+                var ID = 3;
+                function addRow() {
+                    var dingVal = parseFloat(document.getElementById("dingus").value, 10);
+                    var globalDing = parseFloat(document.getElementById("globalDingus").innerHTML, 10);
+                    var total1 = dingVal + globalDing
+                    document.getElementById("globalDingus").innerHTML =  total1
+                    var widgVal = parseFloat(document.getElementById("widget").value, 10);
+                    var globalWidg = parseFloat(document.getElementById("globalWidget").innerHTML, 10);
+                    var total2 = widgVal + globalWidg
+                    document.getElementById("globalWidget").innerHTML = total2
+                    var toteVal = parseFloat(document.getElementById("tote").value, 10);
+                    var globalTote = parseFloat(document.getElementById("globalTotal").innerHTML, 10);
+                    var total3 = (toteVal + globalTote).toFixed(2);
+                    document.getElementById("globalTotal").innerHTML = total3
+                    var table = document.getElementById("initial");
+                    var row = table.insertRow(-1);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    cell1.innerHTML = ID;
+                    ID += 1
+                    var today = new Date()
+                    var date = (today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear()
+                    cell2.innerHTML = date;
+                    cell3.innerHTML = dingVal;
+                    cell4.innerHTML = widgVal;
+                    cell5.innerHTML = toteVal;
+                    // if(store.orderHistory) {
+                    //     var old = localStorage.getItem("orders")
+                    //     localStorage.setItem("orders", old + [ID, date, quan1, quant3, quant5])
+                    //     document.getElementById("OrderForm").reset();
+
+                    // }
+                    var data = {a: total1, b: total2}
+                    var width = 400
+                    height = 400
+                    margin = 40
+
+                    var radius = Math.min(width, height) / 2 - margin
+                    d3.select("#my_dataviz").select("svg").remove()
+
+                    var svg = d3.select("#my_dataviz")
+                      .append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                      .classed("svg-responsive", true)
+                      .classed("svg-container", true) 
+                       .attr("preserveAspectRatio", "xMinYMin meet")
+                       .attr("viewBox", "0 0 600 400")
+                      .append("g")
+                        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                  
+                    var color = d3.scaleOrdinal()
+                      .domain(data)
+                      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"])
+
+                    var pie = d3.pie()
+                      .value(function(d) {return d.value; })
+                    var data_ready = pie(d3.entries(data))
+
+                    svg
+                      .selectAll('whatever')
+                      .data(data_ready)
+                      .enter()
+                      .append('path')
+                      .attr('d', d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(radius)
+                      )
+                      .attr('fill', function(d){ return(color(d.data.key)) })
+                      .attr("stroke", "black")
+                      .style("stroke-width", "2px")
+                      .style("opacity", 0.7)
+
+                    d3.select("svg").remove()
+
+                    var w = 1000,
+                        h = 500,
+                        padding = 40;
+
+                        var dataset = [
+                            { dingus: 1,  widget: 1 },
+                            { dingus: 2,  widget: 2 },
+                        ];
+
+                        dataset.push({ dingus: dingVal, widget: widgVal})
+
+                        var fruits = Object.keys(dataset[0]);
+
+                        var colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+                        var xScale = d3.scaleBand()
+                            .domain(d3.range(dataset.length))
+                            .range([padding, w - padding])
+                            .paddingInner(0.05);
+
+                        var yScale = d3.scaleLinear()
+                            .domain([0, d3.max(dataset, function(d) {
+                                var total = 0;
+                                for (var i = 0; i < fruits.length; i++) {
+                                    total += d[fruits[i]];
+                                }
+                                return total;
+                            })])
+                            .range([h - padding, 0]);
+                            
+                        var yAxis = d3.axisLeft()
+                            .scale(yScale)
+                            .ticks(6);
+
+                        var stack = d3.stack()
+                            .keys(fruits)
+                            .order(d3.stackOrderDescending);
+                            
+                        var series = stack(dataset);
+                            
+                        var svg = d3.select('svg')
+                            .attr('width', w)
+                            .attr('height', h)
+
+                        var groups = svg.selectAll('g')
+                            .data(series)
+                            .enter()
+                            .append('g')
+                            .style('fill', function(d, i){
+                                return colors(i);
+                            });
+
+                        var rects = groups.selectAll('rect')
+                            .data(function(d){return d;})
+                            .enter()
+                            .append('rect')
+                            .attr('x', function(d, i){
+                                return xScale(i);
+                            })
+                            .attr('y', function(d){
+                                return yScale(d[1]);
+                            })
+                            .attr('height', function(d) {
+                                return yScale(d[0]) - yScale(d[1]);
+                            })
+                            .attr('width', xScale.bandwidth());
+                            
+                        svg.append('g')
+                            .attr('class', 'y axis')
+                            .attr('transform', 'translate(' + padding + ', 0)')
+                            .call(yAxis);
+
+                        var legend = svg.append('g')
+                            .attr('class', 'legend')
+                            .attr('transform', 'translate(' + (padding + 12) + ', 0)');
+
+                        legend.selectAll('rect')
+                            .data(fruits)
+                            .enter()
+                            .append('rect')
+                            .attr('x', 0)
+                            .attr('y', function(d, i){
+                                return i * 18;
+                            })
+                            .attr('width', 12)
+                            .attr('height', 12)
+                            .attr('fill', function(d, i){
+                                return colors(i);
+                            });
+                            
+                        legend.selectAll('text')
+                            .data(fruits)
+                            .enter()
+                            .append('text')
+                            .text(function(d){
+                                return d;
+                            })
+                            .attr('x', 18)
+                            .attr('y', function(d, i){
+                                return i * 18;
+                            })
+                            .attr('text-anchor', 'start')
+                            .attr('alignment-baseline', 'hanging');
+                        }
+            </script>
+  		</details>
+	</form>
+</body>
+</html>

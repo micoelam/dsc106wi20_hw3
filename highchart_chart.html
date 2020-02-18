@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Global Dashboard
+	</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/style.css">
+	<meta name="descrption" content="Dingus and Widget info">
+	<meta charset="UTF-8">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat%7CPaytone+One&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+</head>
+<body>
+	<img id="head_image" src="./resources/images/dw-logo.png" alt="logo">
+	<h1>Global DashBoard</h1>
+	<table id="t1">
+        <tr>
+            <th>Dingus</th>
+            <th>Widget</th> 
+            <th>Sales</th>
+        </tr>
+        <tr class="grid-container2">
+            <th id = "globalDingus">3</th>
+            <th id = "globalWidget">3</th>
+            <th id = "globalTotal">72.72</th>  
+        </tr>
+    </table>
+    <hr>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+</figure>
+
+<script src="hw2.js">
+    Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Stacked column chart'
+    },
+    xAxis: {
+        categories: ['Dingus', 'Widget']
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Dingus and Widget sold per day'
+        },
+        stackLabels: {
+            enabled: true,
+            style: {
+                fontWeight: 'bold',
+                color: ( // theme
+                    Highcharts.defaultOptions.title.style &&
+                    Highcharts.defaultOptions.title.style.color
+                ) || 'gray'
+            }
+        }
+    },
+    legend: {
+        align: 'right',
+        x: -30,
+        verticalAlign: 'top',
+        y: 25,
+        floating: true,
+        backgroundColor:
+            Highcharts.defaultOptions.legend.backgroundColor || 'white',
+        borderColor: '#CCC',
+        borderWidth: 1,
+        shadow: false
+    },
+    tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    },
+    plotOptions: {
+        column: {
+            stacking: 'normal',
+            dataLabels: {
+                enabled: true
+            }
+        }
+    },
+    series: [{
+        name: 'Dingus',
+        data: [1, 2]
+    }, {
+        name: 'Widget',
+        data: [1, 2]
+    }]
+});
+</script>
+
+
+
+
+
+    <table id="t3">
+    	<caption>Order History</caption>
+        <!-- <script 
+            src="hw2.js">
+        </script> -->
+    	<tr>
+    		<th rowspan="2">ID#</th>
+    		<th rowspan="2">Date</th>
+    		<th colspan="2">Quantity</th>
+    		<th rowspan="2">Total</th>
+    	</tr>
+    	<tr>
+    		<td >Dingus</td>
+    		<td >Widget</td>
+    	</tr>
+        <tbody id="initial">
+            <script type="text/javascript">
+                localStorage.setItem("orders", JSON.stringify(store.orderHistory))
+                if ((localStorage.getItem("orders").length == 0)) {
+                    store.orderHistory = localStorage.getItem("orders");
+                }
+                else {
+                    var table = document.getElementById("initial");
+                    for (var index = 0; index < generateEntries().length; index++) {
+                        order = generateEntries()[index];
+                        var row = table.insertRow(-1);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        var cell4 = row.insertCell(3);
+                        var cell5 = row.insertCell(4);
+                        cell1.innerHTML = order[0];
+                        cell2.innerHTML = order[1];
+                        cell3.innerHTML = order[2];
+                        cell4.innerHTML = order[3];
+                        cell5.innerHTML = ((order[2] * DINGUS_PRICE) + (order[3] * WIDGET_PRICE)).toFixed(2);
+                        var old = localStorage.getItem("orders")
+                        // localStorage.setItem("orders", old + orders)
+                    }
+                }
+            </script>
+        </tbody>
+        <tfoot>
+    	   <tr>
+    	       <td id="tblFoot" colspan="5"> &copy; 2020 D&W Worldwide. </td>
+            </tr>
+        </tfoot>
+    </table>
+    <form>
+    	<details>
+    		<summary> Order Form </summary>
+            <script src="scripts/hw1.js"></script>
+    		<p> Dingus<input id="dingus" placeholder="0" type="text" onkeyup="manage(this);total();"> @ <input type="text" name="cost" value=14.25 id="dingusCost" disabled> =$ <input type="text" placeholder="0.00" id="dingustote" disabled>
+            </p>
+    		<p> Widget<input id="widget" placeholder="0" type="text" onkeyup="manage(this);total2();"> @ <input type="text" name="cost" value=9.99 id="widgetCost" disabled> =$ <input type="text" placeholder="0.00" id="widgettote" disabled>
+            </p>
+    		<p> Total $<input type="text" id="tote" value="0.00" disabled>
+            </p>
+            <button id="btnCancel" class="button-error pure-button" onclick=enableBtn()>Cancel</button>
+            <button type="button" id="btnOrder" class="button-success pure-button" onclick="addRow()" disabled>Order</button>
+            <script>
+                function manage(input) {
+                    var btn = document.getElementById('btnOrder');
+                    if (document.getElementById("dingus").value != '' || document.getElementById("widget").value != '') {
+                        btn.disabled = false;
+                    }
+                    else {
+                        btn.disabled = true;
+                    }
+                }
+                function total() {
+                    var quant = parseFloat(document.getElementById("dingus").value, 10.00);
+                    var cost = parseFloat(document.getElementById("dingusCost").value, 10.00);
+                    var subtote = quant * cost.toFixed(2);
+                    if (document.getElementById("dingus") === NaN) {
+                        subtote = 0.00;
+                    }
+                    document.getElementById("dingustote").value = subtote.toFixed(2);
+                    var total = parseFloat(document.getElementById("tote").value, 10.00);
+                    document.getElementById("tote").value = (total + subtote).toFixed(2)
+                    if (document.getElementById("dingus").value.length == 0) {
+                        document.getElementById("dingustote").value = (0.00).toFixed(2);
+                        document.getElementById("tote").value = (0.00).toFixed(2);
+                    }
+                }
+                function total2() {
+                    var quant = parseFloat(document.getElementById("widget").value, 10);
+                    var cost = parseFloat(document.getElementById("widgetCost").value, 10);                 
+                    var subtote = quant * cost;
+                    document.getElementById("widgettote").value = subtote.toFixed(2);
+                    var total = parseFloat(document.getElementById("tote").value, 10.00);
+                    document.getElementById("tote").value = (total + subtote).toFixed(2)
+                    if (document.getElementById("widget").value.length == 0) {
+                        document.getElementById("widgettote").value = (0.00).toFixed(2);
+                        document.getElementById("tote").value = (0.00).toFixed(2);
+                    }
+                }
+            </script>
+            <script>
+                function enableBtn() {
+                    document.getElementById("btnOrder").disabled = true;
+                }
+            </script>
+            <script>
+                var ID = 3;
+                function addRow() {
+                    var dingVal = parseFloat(document.getElementById("dingus").value, 10);
+                    var globalDing = parseFloat(document.getElementById("globalDingus").innerHTML, 10);
+                    var total1 = dingVal + globalDing
+                    document.getElementById("globalDingus").innerHTML =  total1
+                    var widgVal = parseFloat(document.getElementById("widget").value, 10);
+                    var globalWidg = parseFloat(document.getElementById("globalWidget").innerHTML, 10);
+                    var total2 = widgVal + globalWidg
+                    document.getElementById("globalWidget").innerHTML = total2
+                    var toteVal = parseFloat(document.getElementById("tote").value, 10);
+                    var globalTote = parseFloat(document.getElementById("globalTotal").innerHTML, 10);
+                    var total3 = (toteVal + globalTote).toFixed(2);
+                    document.getElementById("globalTotal").innerHTML = total3
+                    var table = document.getElementById("initial");
+                    var row = table.insertRow(-1);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    cell1.innerHTML = ID;
+                    ID += 1
+                    var today = new Date()
+                    var date = (today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear()
+                    cell2.innerHTML = date;
+                    cell3.innerHTML = dingVal;
+                    cell4.innerHTML = widgVal;
+                    cell5.innerHTML = toteVal;
+                    var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+                    const day = 3;
+                    rect.setAttribute('class', "bar");
+                    rect.setAttribute('x', "78");
+                    rect.setAttribute('width', "31");
+                    rect.setAttribute('y', "307");
+                    rect.setAttribute('height', "144");
+                    document.getElementById('rec').appendChild(rect);
+                    if(store.orderHistory) {
+                        var old = localStorage.getItem("orders")
+                        localStorage.setItem("orders", old + [ID, date, quant1, quant3, quant5])
+                        document.getElementById("OrderForm").reset();
+
+                    }
+                }
+            </script>
+  		</details>
+	</form>
+</body>
+</html>
